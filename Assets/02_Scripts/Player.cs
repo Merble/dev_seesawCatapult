@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -7,12 +8,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Catapult _PlayerCatapult;
     [SerializeField] private GameObject _Indicator;
     [SerializeField] private PowerUpManager _PlayerPowerUpManager;
-    [Space] 
-    [SerializeField] private Human _FatHuman;
-    [SerializeField] private Human _ThinHuman;
     
-    
-
     private void Awake()
     {
         _Joystick.DragDidStart += () => { _Indicator.SetActive(true); };
@@ -20,13 +16,11 @@ public class Player : MonoBehaviour
         _Joystick.DragDidEnd += direction => { _PlayerCatapult.ThrowHumans(-direction);  _Indicator.SetActive(false); };
 
         _PlayerCatapult.HumanDidComeToCatapult += OnHumanArriveCatapult;
-        _PlayerCatapult.DidThrewHumans += () =>
+        _PlayerCatapult.DidThrewHumans += (humans) =>
         {
-            _PlayerPowerUpManager.HumanGroupList.Add(_PlayerCatapult.HumansOnCatapult);
-            _PlayerCatapult.HumansOnCatapult.Clear();
+            _PlayerPowerUpManager.HumanGroupList.Add(humans);
         };
 
-        _PlayerPowerUpManager.PowerUpDidInstantiate += InstantiateHumansForPowerUp;
     }
 
     private void OnHumanArriveCatapult(Human human)
@@ -35,7 +29,7 @@ public class Player : MonoBehaviour
 
         human.IsOnCatapult = true;
 
-        _PlayerCatapult.HumansOnCatapult.Add(human);
+        _PlayerCatapult.AddHuman(human);
 
         _HumanManager.HumansOnRandomMove.Remove(human);
         _HumanManager.MoveHumansToCatapult();
@@ -47,7 +41,7 @@ public class Player : MonoBehaviour
         _Indicator.transform.position = new Vector3(finishPos.x, _Indicator.transform.position.y, finishPos.z);
     }
 
-    private void InstantiateHumansForPowerUp(HumanType type, int humanNumberToInstantiate)
+    /*private void InstantiateHumansForPowerUp(HumanType type, int humanNumberToInstantiate)
     {
         switch (type)
         {
@@ -66,5 +60,5 @@ public class Player : MonoBehaviour
             default:
                 return;
         }
-    }
+    }*/
 }

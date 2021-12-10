@@ -11,6 +11,7 @@ public class Human : MonoBehaviour
 {
     [SerializeField] private float _Mass;
     [SerializeField] private HumanType _Type;
+    [SerializeField] private Human _Prefab;
 
     private int? _randomMoveTweenId;
 
@@ -29,6 +30,8 @@ public class Human : MonoBehaviour
 
     public float MaxZ { get; set; }
     public float MinZ { get; set; }
+
+    public Human Prefab => _Prefab;
 
     public void MoveTo(Vector3 catapultPos)
     {

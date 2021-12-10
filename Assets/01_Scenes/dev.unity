@@ -2243,6 +2243,7 @@ MonoBehaviour:
   _PowerUps:
   - {fileID: 255901084}
   - {fileID: 1548315498}
+  _InstantiateCircleRadius: 2
 --- !u!4 &686594158
 Transform:
   m_ObjectHideFlags: 0
@@ -3182,8 +3183,6 @@ MonoBehaviour:
   _PlayerCatapult: {fileID: 1194911548}
   _Indicator: {fileID: 1720071304}
   _PlayerPowerUpManager: {fileID: 686594157}
-  _FatHuman: {fileID: -4698773961801038350, guid: db4affafaf161d64f94a5099fba21617, type: 3}
-  _ThinHuman: {fileID: -4698773961801038350, guid: e57106ef3f1ab0e4abca67b2911eafb1, type: 3}
 --- !u!1 &1043312772
 GameObject:
   m_ObjectHideFlags: 0
@@ -5542,6 +5541,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4230023014946241372, guid: 923f26e9f7474a94e9fff790c11ea29b, type: 3}
+      propertyPath: _PowerUpEffectNumber
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6013292950045879915, guid: 923f26e9f7474a94e9fff790c11ea29b, type: 3}
       propertyPath: m_Name
       value: Multiplication PowerUp
@@ -6041,7 +6044,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2568323853457170925, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.63
+      value: 6.36
       objectReference: {fileID: 0}
     - target: {fileID: 2568323853457170925, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6049,7 +6052,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2568323853457170925, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.02
+      value: 11.71
       objectReference: {fileID: 0}
     - target: {fileID: 2568323853457170925, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
       propertyPath: m_LocalRotation.w
@@ -6078,6 +6081,10 @@ PrefabInstance:
     - target: {fileID: 2568323853457170925, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2680320774265002381, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
+      propertyPath: _PowerUpEffectNumber
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5196957056519966612, guid: 21ae473355da6c54f8bc3f68744f6a9f, type: 3}
       propertyPath: m_Name

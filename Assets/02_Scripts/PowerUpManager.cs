@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class PowerUpManager : MonoBehaviour
 {
-    public event Action<HumanType, int> PowerUpDidInstantiate;
-    
     [SerializeField] private List<PowerUps> _PowerUps = new List<PowerUps>();
+    [SerializeField] private float _InstantiateCircleRadius;
 
-    public List<List<Human>> HumanGroupList { get; } = new List<List<Human>>();
+    public List<Human[]> HumanGroupList { get; } = new List<Human[]>();
 
     private void Awake()
     {
@@ -19,62 +19,91 @@ public class PowerUpManager : MonoBehaviour
         }
     }
 
-    private void OnPowerUpUse(Human human, PowerUpEnum powerUpType, int powerUpEffectNumber)
+    private void OnPowerUpUse(Human human, PowerUpEnum powerUpType, Vector3 powerUpPos,int powerUpEffectNumber)
     {
-        foreach (var humanGroup in HumanGroupList)
+        foreach (var humanGroup in HumanGroupList.Where(humanGroup => humanGroup.Contains(human)))
         {
-            if (humanGroup.Contains(human))
+            switch (powerUpType)
             {
-                Debug.Log("We're here!");
-                switch (powerUpType)
-                {
-                    case PowerUpEnum.Addition:
-                        AddHumans(humanGroup, powerUpEffectNumber);
-                        break;
-                    case PowerUpEnum.Multiplication:
-                        MultiplyHumans(humanGroup, powerUpEffectNumber);
-                        break;
-                    default:
-                        return;
-                }
+                case PowerUpEnum.Addition:
+                    AddHumans(humanGroup, powerUpPos,powerUpEffectNumber);
+                    break;
+                case PowerUpEnum.Multiplication:
+                    MultiplyHumans(humanGroup, powerUpPos,powerUpEffectNumber);
+                    break;
+                default:
+                    return;
             }
         }
     }
     
-    private void MultiplyHumans(List<Human> humanGroup, int powerUpEffectNumber)
+    private void MultiplyHumans(Human[] humanGroup, Vector3 powerUpPos,int powerUpEffectNumber)
     {
-        var thinHumanCounter = humanGroup.Count(human => human.Type == HumanType.Thin);
-        var fatHumanCounter = humanGroup.Count(human => human.Type == HumanType.Fat);
-
-        // foreach (var human in humanGroup)
-        // {
-        //     if (human.Type == HumanType.Fat)
-        //     {
-        //         fatHumanCounter++;
-        //     }
-        //     else
-        //     {
-        //         thinHumanCounter++;
-        //     }
-        // }
-        
-        if (fatHumanCounter > 0)
+        var thinHumanCounter = 0;
+        Human thinHumanPrefab = null;
+        foreach (var human in humanGroup)
         {
-            var number = fatHumanCounter * (powerUpEffectNumber - 1);
-            PowerUpDidInstantiate?.Invoke(HumanType.Fat, number);
+            if (human.Type != HumanType.Thin) continue;
+            
+            thinHumanPrefab = human.Prefab;
+            thinHumanCounter++;
+        }
+
+        var fatHumanCounter = 0;
+        Human fatHumanPrefab = null;
+        foreach (var human in humanGroup)
+        {
+            if (human.Type != HumanType.Fat) continue;
+            
+            fatHumanPrefab = human.Prefab;
+            fatHumanCounter++;
         }
         
-        if (thinHumanCounter > 0)
+        var thinHumanNumber = thinHumanCounter * (powerUpEffectNumber - 1);
+        for (var i = 0; i < thinHumanNumber; i++)
         {
-            var number = thinHumanCounter * (powerUpEffectNumber - 1);
-            PowerUpDidInstantiate?.Invoke(HumanType.Thin, number);
+            var pos = Random.insideUnitCircle * _InstantiateCircleRadius;
+            
+            if (thinHumanPrefab is null) continue;
+            
+            var newPos = new Vector3(powerUpPos.x + pos.x, thinHumanPrefab.transform.position.y, powerUpPos.z + pos.y);
+            Instantiate(thinHumanPrefab, newPos, Quaternion.identity);
+        }
+        
+        var fatHumanNumber = fatHumanCounter * (powerUpEffectNumber - 1);
+        for (var i = 0; i < fatHumanNumber; i++)
+        {
+            var pos = Random.insideUnitCircle * _InstantiateCircleRadius;
+            
+            if (fatHumanPrefab is null) continue;
+            
+            var newPos = new Vector3(powerUpPos.x + pos.x, fatHumanPrefab.transform.position.y, powerUpPos.z + pos.y);
+            Instantiate(fatHumanPrefab, newPos, Quaternion.identity);
         }
     }
 
-    private void AddHumans(List<Human> humanGroup, int powerUpEffectNumber)
+    private void AddHumans(Human[] humanGroup, Vector3 powerUpPos, int powerUpEffectNumber)
     {
-        var fatHumanCounter = humanGroup.Count(human => human.Type == HumanType.Fat);
-
-        PowerUpDidInstantiate?.Invoke(fatHumanCounter > 0 ? HumanType.Fat : HumanType.Thin, powerUpEffectNumber);
+        Human humanPrefab = null;
+        foreach (var human in humanGroup)
+        {
+            if (human.Type == HumanType.Fat)
+            {
+                humanPrefab = human.Prefab;
+                break;
+            }
+            
+            humanPrefab = human.Prefab;
+        }
+        
+        for (var i = 0; i < powerUpEffectNumber; i++)
+        {
+            var pos = Random.insideUnitCircle * _InstantiateCircleRadius;
+            
+            if (humanPrefab is null) continue;
+            
+            var newPos = new Vector3(powerUpPos.x + pos.x, humanPrefab.transform.position.y, powerUpPos.z + pos.y);
+            Instantiate(humanPrefab, newPos, Quaternion.identity);
+        }
     }
 }

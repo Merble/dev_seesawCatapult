@@ -9,13 +9,11 @@ public enum PowerUpEnum
 
 public class PowerUps : MonoBehaviour
 {
-    public event Action<Human, PowerUpEnum, int> DidUsePowerUp;
+    public event Action<Human, PowerUpEnum, Vector3, int> DidUsePowerUp;
     
     [SerializeField] private PowerUpEnum _PowerUp;
     [SerializeField] private int _PowerUpEffectNumber;
 
-    // public float PowerUpEffectNumber => _PowerUpEffectNumber;
-    // public PowerUpEnum PowerUp => _PowerUp;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -23,7 +21,7 @@ public class PowerUps : MonoBehaviour
         
         if (!human) return;
         
-        DidUsePowerUp?.Invoke(human, _PowerUp, _PowerUpEffectNumber);
+        DidUsePowerUp?.Invoke(human, _PowerUp, transform.position,_PowerUpEffectNumber);
         gameObject.SetActive(false);
     }
 }

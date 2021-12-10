@@ -5,7 +5,7 @@ using UnityEngine;
 public class Catapult : MonoBehaviour
 {
     public event Action<Human> HumanDidComeToCatapult;
-    public event Action DidThrewHumans;
+    public event Action<Human[]> DidThrewHumans;
     
     [SerializeField] private float _ThrowForce;
     [SerializeField] private float _DirectionValueY;
@@ -13,7 +13,7 @@ public class Catapult : MonoBehaviour
     
     private readonly float _gravity = Math.Abs(Physics.gravity.y);
 
-    public List<Human> HumansOnCatapult { get; } = new List<Human>();
+    private List<Human> HumansOnCatapult { get; } = new List<Human>();
 
     private void OnTriggerEnter(Collider other)
     {
@@ -28,7 +28,8 @@ public class Catapult : MonoBehaviour
             humanRb.AddForce(new Vector3(direction.x, _DirectionValueY, direction.y) * _ThrowForce, ForceMode.VelocityChange);
             human.IsOnCatapult = false;
         }
-        DidThrewHumans?.Invoke();
+        DidThrewHumans?.Invoke(HumansOnCatapult.ToArray());
+        HumansOnCatapult.Clear();
     }
 
     public Vector3 FindTrajectoryFinishPosition(Vector2 direction)
@@ -41,5 +42,10 @@ public class Catapult : MonoBehaviour
         var finishPos = transform.position + (distance * groundDirection);
         
         return finishPos;
+    }
+
+    public void AddHuman(Human human)
+    {
+        HumansOnCatapult.Add(human);
     }
 }
