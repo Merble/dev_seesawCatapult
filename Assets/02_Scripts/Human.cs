@@ -1,12 +1,20 @@
-using System;
 using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+public enum HumanType
+{
+    Fat,
+    Thin
+}
 public class Human : MonoBehaviour
 {
     [SerializeField] private float _Mass;
-    
+    [SerializeField] private HumanType _Type;
+
+    private int? _randomMoveTweenId;
+
+    public HumanType Type => _Type;
     public Vector3 MoveSpot { get; set; }
 
     public bool IsOnRandomMove { get; set; }
@@ -21,12 +29,16 @@ public class Human : MonoBehaviour
 
     public float MaxZ { get; set; }
     public float MinZ { get; set; }
-    
-    private void Awake()
-    {
-        //GetComponent<Rigidbody>().mass = _Mass;
-    }
 
+    public void MoveTo(Vector3 catapultPos)
+    {
+        if(_randomMoveTweenId != null) LeanTween.cancel(_randomMoveTweenId.Value);
+        IsOnRandomMove = false;
+
+        var moveDuration = Vector3.Distance(transform.position, catapultPos) / MaxMoveSpeed;
+        LeanTween.move(gameObject, catapultPos, moveDuration);
+    }
+    
     public IEnumerator MoveRandomLocation()
     {
         if (!IsOnRandomMove) yield break;
@@ -39,17 +51,9 @@ public class Human : MonoBehaviour
         var moveSpeed = Random.Range(MinMoveSpeed, MaxMoveSpeed);
         var moveDuration = Vector3.Distance(position, MoveSpot) / moveSpeed;
 
-        LeanTween.move(gameObject, MoveSpot, moveDuration);
+        _randomMoveTweenId = LeanTween.move(gameObject, MoveSpot, moveDuration).id;
 
         yield return new WaitForSeconds(moveDuration);
         StartCoroutine(MoveRandomLocation());
-    }
-
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.name == "Board" && !IsOnRandomMove)
-        {
-            GetComponent<Rigidbody>().mass = _Mass;
-        }
     }
 }

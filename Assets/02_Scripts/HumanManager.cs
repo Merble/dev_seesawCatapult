@@ -1,18 +1,14 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public class HumanManager : MonoBehaviour
 {
     [SerializeField] private Transform _Catapult;
     [Space]
-    [SerializeField] private List<Human> _HumansOnRandomMove;
-    [SerializeField] private List<Human> _ThrownHumans;
+    [SerializeField] private List<Human> _Humans;
     [Space]
     [SerializeField] private float _MinHumanSpeed;
     [SerializeField] private float _MaxHumanSpeed;
@@ -22,21 +18,24 @@ public class HumanManager : MonoBehaviour
     [SerializeField] private float _MaxZ;
     [Space]
     [SerializeField] private float _HumanToCatapultWaitDuration;
-    [SerializeField] private float _HumanRandomMoveWaitDuration;
-    
 
-    public List<Human> HumansOnRandomMove => _HumansOnRandomMove;
-    public List<Human> ThrownHumans => _ThrownHumans;
+    public List<Human> HumansOnRandomMove { get; } = new List<Human>();
+
+    public List<Human> ThrownHumans { get; } = new List<Human>();
 
     private void Awake()
     {
+        foreach (var human in _Humans)
+        {
+            HumansOnRandomMove.Add(human);
+        }
         MoveHumansRandomly();
         MoveHumansToCatapult();
     }
 
     private void MoveHumansRandomly()
     {
-        foreach (var human in _HumansOnRandomMove.Where(human => !human.IsOnCatapult && !human.IsOnSeesaw))
+        foreach (var human in HumansOnRandomMove.Where(human => !human.IsOnCatapult && !human.IsOnSeesaw))
         {
             human.MaxX = _MaxX;  human.MinX = _MinX;
             human.MaxZ = _MaxZ;  human.MinZ = _MinZ;
@@ -57,13 +56,10 @@ public class HumanManager : MonoBehaviour
     {
         yield return new WaitForSeconds(waitTime);
 
-        if (!_HumansOnRandomMove.Any()) yield break;
+        if (!HumansOnRandomMove.Any()) yield break;
         
-        var human = _HumansOnRandomMove[0];
-        human.IsOnRandomMove = false;
-        
-        var moveDuration = Vector3.Distance(human.transform.position, _Catapult.position) / _MaxHumanSpeed;
-        LeanTween.move(human.gameObject, _Catapult, moveDuration);
+        var human = HumansOnRandomMove[Random.Range(0, HumansOnRandomMove.Count)];
+        human.MoveTo(_Catapult.position);
     }
 
     private void MoveHumansToNearestSeesaw()
