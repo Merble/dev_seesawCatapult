@@ -7,7 +7,7 @@ public enum PowerUpEnum
     Addition
 }
 
-public class PowerUps : MonoBehaviour
+public class PowerUp : MonoBehaviour
 {
     public event Action<Human, PowerUpEnum, Vector3, int> DidUsePowerUp;
     
@@ -17,7 +17,7 @@ public class PowerUps : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        var human = other.GetComponent<Human>();
+        var human = other.GetComponentInParent<Human>();
         
         if (!human) return;
         

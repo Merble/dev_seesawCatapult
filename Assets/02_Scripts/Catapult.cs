@@ -5,7 +5,7 @@ using UnityEngine;
 public class Catapult : MonoBehaviour
 {
     public event Action<Human> HumanDidComeToCatapult;
-    public event Action<Human[]> DidThrewHumans;
+    public event Action<Human[]> DidThrowHumans;
     
     [SerializeField] private float _ThrowForce;
     [SerializeField] private float _DirectionValueY;
@@ -15,20 +15,20 @@ public class Catapult : MonoBehaviour
 
     private List<Human> HumansOnCatapult { get; } = new List<Human>();
 
-    private void OnTriggerEnter(Collider other)
+    public void DidHumanCome(Human human)
     {
-        HumanDidComeToCatapult?.Invoke(other.GetComponent<Human>());
+        HumanDidComeToCatapult?.Invoke(human);
     }
 
     public void ThrowHumans(Vector2 direction)
     {
         foreach (var human in HumansOnCatapult)
         {
-            var humanRb = human.GetComponent<Rigidbody>();
-            humanRb.AddForce(new Vector3(direction.x, _DirectionValueY, direction.y) * _ThrowForce, ForceMode.VelocityChange);
-            human.IsOnCatapult = false;
+            human.Rigidbody.AddForce(new Vector3(direction.x, _DirectionValueY, direction.y) * _ThrowForce, ForceMode.VelocityChange);
+            human.SetState(Human.HumanState.IsFlying);
+            //human.MakeColliderSmaller();
         }
-        DidThrewHumans?.Invoke(HumansOnCatapult.ToArray());
+        DidThrowHumans?.Invoke(HumansOnCatapult.ToArray());
         HumansOnCatapult.Clear();
     }
 
