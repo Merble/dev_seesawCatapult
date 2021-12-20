@@ -4,15 +4,7 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Team _Team;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public Team Team => _Team;
 }

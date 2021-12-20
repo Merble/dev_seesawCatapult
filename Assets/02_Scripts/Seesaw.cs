@@ -1,25 +1,23 @@
-using System;
 using UnityEngine;
 
 public class Seesaw : MonoBehaviour
 {
-    public event Action PlayerDidWin;
-    public event Action EnemyDidWin;
+    // public event Action PlayerDidWin;
+    // public event Action EnemyDidWin;
 
-    [SerializeField] private SeesawPad _PlayerSeesawPad;
-    [SerializeField] private SeesawPad _EnemySeesawPad;
+    [SerializeField] private SeesawBranch _PlayerSeesawBranch;
+    [SerializeField] private SeesawBranch _EnemySeesawBranch;
+    [Space]
     [SerializeField] private float _MassEffectOnBalance;
     [SerializeField] private float _MaxRotationAngle;
-        
     [SerializeField] private float _BalanceValue;   // Between (0, 1)
-        
     [SerializeField] private float _RotationSpeed;
 
     private void Awake()
     {
         _BalanceValue = .5f;
-        _PlayerSeesawPad.DidMassChange += BalanceChange;
-        _EnemySeesawPad.DidMassChange += BalanceChange;
+        _PlayerSeesawBranch.DidMassChange += BalanceChange;
+        _EnemySeesawBranch.DidMassChange += BalanceChange;
     }
     
     private void BalanceChange(float mass, bool isPlayer)
@@ -40,12 +38,6 @@ public class Seesaw : MonoBehaviour
         // }
     }
 
-    // public void SetBalance(float val)
-    // {
-    //     _BalanceValue = val;
-    //     RotateBoardToCurrentBalance();
-    // }
-
     private void RotateBoardToCurrentBalance()
     {
         var newAngle = Mathf.Lerp(-_MaxRotationAngle, _MaxRotationAngle, _BalanceValue);
@@ -58,13 +50,8 @@ public class Seesaw : MonoBehaviour
             
         var angleDistance = Mathf.Abs(newAngle - angle) / _RotationSpeed;
         var rotationEuler = new Vector3(newAngle, 0, 0);
-
-        foreach (var human in _PlayerSeesawPad.Humans)
-        {
-            human.transform.SetParent(transform);
-        }
         
         LeanTween.cancel(gameObject);
-        LeanTween.rotate(gameObject, -rotationEuler, angleDistance);
+        LeanTween.rotate(gameObject, rotationEuler, angleDistance);
     }
 }

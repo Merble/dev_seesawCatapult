@@ -24,16 +24,16 @@ public class PowerUpManager : MonoBehaviour
         }
     }
 
-    private void OnPowerUpUse(Human human, PowerUpEnum powerUpType, Vector3 powerUpPos,int powerUpEffectNumber)
+    private void OnPowerUpUse(Human human, PowerUpType powerUpType, Vector3 powerUpPos,int powerUpEffectNumber)
     {
         foreach (var humanGroup in HumanGroupList.Where(humanGroup => humanGroup.Contains(human)))
         {
             switch (powerUpType)
             {
-                case PowerUpEnum.Addition:
+                case PowerUpType.Addition:
                     AddHumans(humanGroup, powerUpPos,powerUpEffectNumber);
                     break;
-                case PowerUpEnum.Multiplication:
+                case PowerUpType.Multiplication:
                     MultiplyHumans(humanGroup, powerUpPos,powerUpEffectNumber);
                     break;
                 default:
@@ -97,7 +97,7 @@ public class PowerUpManager : MonoBehaviour
         var newHuman = Instantiate(humanPrefab, newPos, Quaternion.identity);
 
         instantiatedHumans.Add(newHuman);
-        newHuman.SetState(Human.HumanState.OnOtherSide);
+        newHuman.SetState(HumanState.OnOtherSide);
 
         // Scale down the human collider to avoid flying humans
         newHuman.MakeColliderSmaller();

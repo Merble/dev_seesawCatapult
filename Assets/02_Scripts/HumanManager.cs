@@ -8,9 +8,10 @@ using Random = UnityEngine.Random;
 public class HumanManager : MonoBehaviour
 {
     [SerializeField] private Catapult _Catapult;
-    [SerializeField] private List<SeesawPad> _Seesaws;
     [Space]
     [SerializeField] private List<Human> _Humans;
+    [Space]
+    [SerializeField] private List<SeesawBranch> _SeesawBranches;
     [Space]
     [SerializeField] private float _MinHumanSpeed;
     [SerializeField] private float _MaxHumanSpeed;
@@ -38,9 +39,9 @@ public class HumanManager : MonoBehaviour
 
     private void Update()
     {
-        foreach (var human in HumansOnOtherSide.Where(human => human.GetState() == Human.HumanState.OnOtherSide))
+        foreach (var human in HumansOnOtherSide.Where(human => human.GetState() == HumanState.OnOtherSide))
         {
-            human.SetState(Human.HumanState.IsMovingToSeesaw);
+            human.SetState(HumanState.IsMovingToSeesaw);
             MoveHumanToNearestSeesaw(human);
         }
     }
@@ -51,7 +52,7 @@ public class HumanManager : MonoBehaviour
         {
             human.SetMinAndMaxValues(_MinX, _MaxX, _MinZ, _MaxZ, _MinHumanSpeed, _MaxHumanSpeed);
 
-            human.SetState(Human.HumanState.RandomMove);
+            human.SetState(HumanState.RandomMove);
             StartCoroutine(human.MoveRandomLocation());
         }
     }
@@ -86,20 +87,20 @@ public class HumanManager : MonoBehaviour
         }));
     }
 
-    private SeesawPad GetNearestSeesaw(Vector3 humanPos)
+    private SeesawBranch GetNearestSeesaw(Vector3 humanPos)
     {
-        SeesawPad nearestSeesaw = null;
+        SeesawBranch nearestSeesaw = null;
         var closestDistanceSqr = Mathf.Infinity;
         
-        foreach(var seesaw in _Seesaws)
+        foreach(var seesawBranch in _SeesawBranches)
         {
-            var directionToTarget = seesaw.transform.position - humanPos;
+            var directionToTarget = seesawBranch.GetSeesawPad().transform.position - humanPos;
             var dSqrToTarget = directionToTarget.sqrMagnitude;
 
             if (!(dSqrToTarget < closestDistanceSqr)) continue;
             
             closestDistanceSqr = dSqrToTarget;
-            nearestSeesaw = seesaw;
+            nearestSeesaw = seesawBranch;
         }
      
         return nearestSeesaw;

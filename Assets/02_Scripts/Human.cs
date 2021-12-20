@@ -3,30 +3,16 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public enum HumanType
-{
-    Fat,
-    Thin
-}
-
 public class Human : MonoBehaviour
 {
-    public enum HumanState
-    {
-        Idle,
-        RandomMove,
-        IsMovingToCatapult,
-        OnCatapult,
-        IsFlying,
-        OnOtherSide,
-        IsMovingToSeesaw,
-        OnSeesaw
-    }
+    
     
     [SerializeField] private CapsuleCollider _CapsuleCollider;
     [SerializeField] private Rigidbody _Rigidbody;
-    [SerializeField] private HumanType _Type;
     [SerializeField] private Human _Prefab;
+    [Space]
+    [SerializeField] private HumanType _Type;
+    [SerializeField] private Team _Team;
     [Space]
     [SerializeField] private float _Mass;
     [SerializeField] private float _ColliderRadiusMin;
@@ -46,6 +32,7 @@ public class Human : MonoBehaviour
 
     public Human Prefab => _Prefab;
     public HumanType Type => _Type;
+    public Team Team => _Team;
     public Rigidbody Rigidbody => _Rigidbody;
     public float Mass => _Mass;
 
@@ -55,29 +42,32 @@ public class Human : MonoBehaviour
         
         if(_randomMoveTweenId != null) LeanTween.cancel(_randomMoveTweenId.Value);
         
-        var pos = catapult.transform.position;
-        var moveDuration = Vector3.Distance(transform.position, pos) / _maxMoveSpeed;
+        var position = transform.position;
+        var catapultPos = catapult.transform.position;
+        var newPos = new Vector3(catapultPos.x, position.y, catapultPos.z);
+        var moveDuration = Vector3.Distance(position, newPos) / _maxMoveSpeed;
 
-        LeanTween.move(gameObject, pos, moveDuration).setOnComplete(() =>
+        LeanTween.move(gameObject, newPos, moveDuration).setOnComplete(() =>
         {
             catapult.DidHumanCome(this);
         });
     }
     
-    public void MoveToSeesaw(SeesawPad seesaw)
+    public void MoveToSeesaw(SeesawBranch seesawBranch)
     {
         _state = HumanState.IsMovingToSeesaw;
         
         if(_randomMoveTweenId != null) LeanTween.cancel(_randomMoveTweenId.Value);
 
         var pos = transform.position;
-        var newPos = seesaw.transform.position;
+        var newPos = seesawBranch.GetSeesawPad().transform.position;
         var moveDuration = Vector3.Distance(pos, newPos) / _maxMoveSpeed;
         
         LeanTween.move(gameObject, newPos, moveDuration).setOnComplete(() =>
         {
             _state = HumanState.OnSeesaw;
-            seesaw.AddHuman(this);
+            seesawBranch.AddHuman(this);
+            transform.SetParent(seesawBranch.GetComponentInParent<Seesaw>().transform);
         });
     }
     
@@ -138,9 +128,12 @@ public class Human : MonoBehaviour
 
     private void CheckIfGrounded(GameObject other)
     {
-        if (!other.GetComponent<Board>()) return;
+        var board = other.GetComponent<Board>();
         
+        if (!board) return;
         if (_state != HumanState.IsFlying) return;
+        if (board.Team != _Team) return; // TODO: Work on the situation where human falls to same side.
+        
         
         _state = HumanState.OnOtherSide;
         MakeColliderBigger();
